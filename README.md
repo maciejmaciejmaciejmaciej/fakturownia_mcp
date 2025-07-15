@@ -1,6 +1,6 @@
-# WooCommerce MCP Server for Netlify
+# Fakturownia MCP Server for Netlify
 
-A serverless WooCommerce MCP (Model Context Protocol) server deployed on Netlify Functions. This allows you to interact with WooCommerce stores via JSON-RPC API calls from Make.com and other automation platforms.
+A serverless fakturownia MCP (Model Context Protocol) server deployed on Netlify Functions. This allows you to interact with WooCommerce stores via JSON-RPC API calls from Make.com and other automation platforms.
 
 ## 🚀 Quick Deploy to Netlify
 
