@@ -44,14 +44,14 @@ export const handler: Handler = async (
     const request = JSON.parse(event.body || "{}");
 
     const allowedMethods = [
-      "fakt_get_invoices",
-      "fakt_get_invoice",
-      "fakt_create_invoice",
-      "fakt_update_invoice",
-      "fakt_delete_invoice",
-      "fakt_send_invoice_by_email",
-      "fakt_change_invoice_status",
-      "fakt_get_invoice_pdf"
+      "fakt_inv_get_invoices",
+      "fakt_inv_get_invoice",
+      "fakt_inv_create_invoice",
+      "fakt_inv_update_invoice",
+      "fakt_inv_delete_invoice",
+      "fakt_inv_send_invoice_by_email",
+      "fakt_inv_change_invoice_status",
+      "fakt_inv_get_invoice_pdf"
     ];
 
     if (request.method === "tools/list") {
@@ -196,9 +196,42 @@ export const handler: Handler = async (
           }),
         };
       }
+
+      // Map new names back to original names for main server
+      const nameMapping = {
+        "fakt_inv_get_invoices": "fakt_get_invoices",
+        "fakt_inv_get_invoice": "fakt_get_invoice",
+        "fakt_inv_create_invoice": "fakt_create_invoice",
+        "fakt_inv_update_invoice": "fakt_update_invoice",
+        "fakt_inv_delete_invoice": "fakt_delete_invoice",
+        "fakt_inv_send_invoice_by_email": "fakt_send_invoice_by_email",
+        "fakt_inv_change_invoice_status": "fakt_change_invoice_status",
+        "fakt_inv_get_invoice_pdf": "fakt_get_invoice_pdf"
+      };
+
+      // Replace the tool name with mapped name before forwarding
+      const mappedRequest = {
+        ...request,
+        params: {
+          ...request.params,
+          name: nameMapping[toolName] || toolName
+        }
+      };
+
+      // Forward modified request to main server
+      const response = await axios.post(MAIN_SERVER_URL, mappedRequest, {
+        headers: { "Content-Type": "application/json" },
+        timeout: 30000
+      });
+
+      return {
+        statusCode: 200,
+        headers,
+        body: JSON.stringify(response.data),
+      };
     }
 
-    // Forward to main server
+    // Forward to main server (only for non-tools/call requests)
     const response = await axios.post(MAIN_SERVER_URL, request, {
       headers: { "Content-Type": "application/json" },
       timeout: 30000
